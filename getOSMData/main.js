@@ -41,8 +41,8 @@ osmread.parse({
         OSM_DATA_BLOB.bounds.push(bounds);
     },
     node: function(node){
-        node.lon = (node.lon - longitude) * 111111 | 0;
-        node.lat = (node.lat - latitude) * 111111 | 0;
+        node.lon = (node.lon - minLongitude) * 111111 | 0;
+        node.lat = (node.lat - minLatitude) * 111111 | 0;
         OSM_DATA_BLOB.node[node.id] = node;
     },
     way: function(way){

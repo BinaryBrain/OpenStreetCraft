@@ -76,7 +76,7 @@ function toMeterMap(degMap) {
 	meterMap = meterMap.map(function (e) {
 		return { x: e.x - minX, y: e.y - minY, z: e.z - minZ};
 	}).map(function (e) {
-		return { x: e.x - squareSize/2, y: e.y - squareSize/2, z: e.z + 2 }
+		return { x: e.x, y: e.y, z: e.z + 2 }
 	});
 
 	return meterMap;
