@@ -5,7 +5,7 @@ function findOSMHighway(data) {
     for (var i = 0; i < data.way.length; ++i) {
         var way = data.way[i];
         if (way.tags.highway) {
-            WAYS.push(way);
+            ways.push(way);
         }
     }
     return ways;
