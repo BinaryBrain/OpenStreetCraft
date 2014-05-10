@@ -2,9 +2,15 @@
 
 require 'json'
 
-def find_highway(data)
-  data['way'].select do |elem|
-    elem['tags'].include? 'highway'
+def highways(data, tag = nil)
+  if tag
+    data['way'].select do |elem|
+      elem['tags']['highway'] == tag.to_s
+    end
+  else
+    data['way'].select do |elem|
+      elem['tags'].keys.include? 'highway'
+    end
   end
 end
 
