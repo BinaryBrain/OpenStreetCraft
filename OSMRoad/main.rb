@@ -37,7 +37,7 @@ def cubes_to_trace(list_nodes)
 end
 
 def slope(node1, node2)
-  node2.lat - node1.lat / node2.lon - node1.lon
+  (node2.lat - node1.lat).abs / (node2.lon - node1.lon).abs
 end
 
 def cubes_on_segment(node1, node2)
