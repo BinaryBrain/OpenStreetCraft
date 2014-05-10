@@ -24,8 +24,8 @@ end
 
 def node(data, node_ref)
   node = data['node'][node_ref.to_s]
-  lat, lon = node['lat'], node['lon']
-  OpenStruct.new({lat: lat, lon: lon})
+  lat, lon = node['lat'].to_f, node['lon'].to_f
+  OpenStruct.new({ lat: lat, lon: lon })
 end
 
 def cubes_to_trace(list_nodes)
@@ -41,8 +41,9 @@ def slope(node1, node2)
 end
 
 def cubes_on_segment(node1, node2)
-  Range.new(node1.lon, node2.lon).map do |n|
-    slope(node1, node2) * n
+  Range.new(node1.lon.to_i, node2.lon.to_i).map do |n|
+    lat, lon = [(slope(node1, node2) * n).to_i, n] rescue [nil, nil]
+    OpenStruct.new({ lat: lat, lon: lon })
   end
 end
 
