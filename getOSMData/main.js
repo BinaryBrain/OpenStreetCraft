@@ -7,7 +7,7 @@ if (process.argv.length < 4) {
 
 var DEG_TO_METER = 111111;
 var ONE_METER = 0.000009;
-var SQUARE_SIZE = 500;
+var SQUARE_SIZE = 10000;
 
 var longitude = process.argv[2];
 var latitude = process.argv[3];
@@ -27,7 +27,7 @@ var OSM_DATA_BLOB = {
     minLongitude : minLongitude,
     maxLongitude : maxLongitude,
     way : [],
-    node : [],
+    node : {},
     bounds : []
 };
 
@@ -43,7 +43,7 @@ osmread.parse({
     node: function(node){
         node.lon = (node.lon - longitude) * 111111 | 0;
         node.lat = (node.lat - latitude) * 111111 | 0;
-        OSM_DATA_BLOB.node.push(node);
+        OSM_DATA_BLOB.node[node.id] = node;
     },
     way: function(way){
         OSM_DATA_BLOB.way.push(way);
