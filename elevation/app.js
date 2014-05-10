@@ -60,22 +60,61 @@ function getLocationsToMeasure(minLat, minLon, maxLat, maxLon) {
 	return locations;
 }
 
+function toMeterMap(degMap) {
+	meterMap = degMap.map(function (e) {
+		return { x: e.x*DegreePerMeter, y: e.y*DegreePerMeter, z: e.z };
+	}).map(function (e) {
+		return { x: Math.round(e.x), y: Math.round(e.y), z: Math.round(e.z) }
+	});
+
+	// Normalizing
+
+	var minX = findMinProp(meterMap, 'x');
+	var minY = findMinProp(meterMap, 'y');
+	var minZ = findMinProp(meterMap, 'z');
+
+	meterMap = meterMap.map(function (e) {
+		return { x: e.x - minX, y: e.y - minY, z: e.z - minZ};
+	}).map(function (e) {
+		return { x: e.x - squareSize/2, y: e.y - squareSize/2, z: e.z + 2 }
+	});
+
+	return meterMap;
+}
+
+function findMinProp(map, prop) {
+	var lowest = Number.POSITIVE_INFINITY;
+	var tmp;
+
+	for (var i = 0, l = map.length; i < l; i++) {
+		tmp = map[i][prop];
+		
+		if (tmp < lowest) {
+			lowest = tmp;
+		}
+	}
+
+	return lowest;
+}
+
 var locations = getLocationsToMeasure(osmData.minLatitude, osmData.minLongitude, osmData.maxLatitude, osmData.maxLongitude);
 
 getElevationData(locations, function (data) {
-	console.log(data)
-
 	try {
 		var data = JSON.parse(data);
 		if(data.status = "OK") {
+			var degMap = [];
+
 			for (var i = 0, l = data.results.length; i < l; i++) {
 				var r = data.results[i];
 
-				// DEV
-				/*
-				console.log('ELE: ', r.elevation);
-				console.log('LOC: ', r.location.lat, r.location.lng);*/	
+				degMap.push({ x: r.location.lng, y: r.location.lat, z: r.elevation });
 			}
+
+			var meterMap = toMeterMap(degMap);
+
+			console.log(meterMap);
+
 		} else {
 			console.error('error', data);
 		}
