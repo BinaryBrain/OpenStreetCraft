@@ -41,7 +41,9 @@ def slope(node1, node2)
 end
 
 def cubes_on_segment(node1, node2)
-  Range.new(node1.lon.to_i, node2.lon.to_i).map do |n|
+  lon1, lon2 = node1.lon.to_i, node2.lon.to_i
+  range = lon1 < lon2 ? (lon1..lon2) : (lon2..lon1)
+  range.map do |n|
     lat, lon = [(slope(node1, node2) * n).to_i, n] rescue [nil, nil]
     OpenStruct.new({ lat: lat, lon: lon })
   end
@@ -69,5 +71,5 @@ p list_nodes.count
 
 # all cubes to trace
 cubes = cubes_to_trace(list_nodes)
-p cubes.first
+p cubes.first.flatten.map { |c| [c.lat, c.lon] }
 p cubes.count
