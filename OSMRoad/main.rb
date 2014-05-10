@@ -50,5 +50,23 @@ end
 
 json_file = './OSMData.json'
 data = JSON.parse(File.open(json_file).read)
-highways = find_highway data
-p highways
+
+# all
+highways = highways data
+p highways.first
+p highways.count
+
+# with filter
+primaries = highways data, :primary
+p primaries.first
+p primaries.count
+
+# nodes
+list_nodes = node_refs(data, highways)
+p list_nodes.first
+p list_nodes.count
+
+# all cubes to trace
+cubes = cubes_to_trace(list_nodes)
+p cubes.first
+p cubes.count
