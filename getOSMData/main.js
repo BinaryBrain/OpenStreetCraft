@@ -2,12 +2,13 @@
 var osmread = require('osm-read');
 
 if (process.argv.length < 4) {
-    console.log('failed');
+    console.log('usage : node main.js 6.563243099999999 46.518709099999995');
+    return;
 }
 
 var DEG_TO_METER = 111111;
-var ONE_METER = 0.000009;
-var SQUARE_SIZE = 500;
+var ONE_METER = 0.000009; // number of deg in a meter
+var SQUARE_SIZE = 500; // meters
 
 var longitude = process.argv[2];
 var latitude = process.argv[3];
@@ -52,4 +53,3 @@ osmread.parse({
         console.log('error: ' + msg);
     }
 });
-
