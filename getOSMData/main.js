@@ -10,15 +10,14 @@ var DEG_TO_METER = 111111;
 var ONE_METER = 0.000009; // number of deg in a meter
 var SQUARE_SIZE = 500; // meters
 
-var longitude = process.argv[2];
-var latitude = process.argv[3];
+var longitude = parseFloat(process.argv[2]);
+var latitude = parseFloat(process.argv[3]);
 
 var minLongitude = longitude - ONE_METER * SQUARE_SIZE;
 var maxLongitude = longitude + ONE_METER * SQUARE_SIZE;
 
 var minLatitude = latitude - ONE_METER * SQUARE_SIZE;
 var maxLatitude  = latitude + ONE_METER * SQUARE_SIZE;
-
 
 var OSM_DATA_BLOB = {
     longitude : longitude,
