@@ -7,7 +7,7 @@ if (process.argv.length < 4) {
 
 var DEG_TO_METER = 111111;
 var ONE_METER = 0.000009;
-var SQUARE_SIZE = 10000;
+var SQUARE_SIZE = 500;
 
 var longitude = process.argv[2];
 var latitude = process.argv[3];
