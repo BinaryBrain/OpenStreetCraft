@@ -1,0 +1,19 @@
+{
+  "name": "OpenStreetCraft",
+  "version": "0.0.0",
+  "description": "OpenStreetCraft ===============",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/BinaryBrain/OpenStreetCraft.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BinaryBrain/OpenStreetCraft/issues"
+  },
+  "homepage": "https://github.com/BinaryBrain/OpenStreetCraft"
+}
