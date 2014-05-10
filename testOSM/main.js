@@ -1,7 +1,7 @@
 var osmread = require('osm-read');
 var http = require("http");
-var parseString = require('xml2json').parseString;
-
+var parseString = require('xml2js').parseString;
+/*
 function getXML(options, onResult)
 {
 
@@ -31,9 +31,36 @@ function getXML(options, onResult)
     req.end();
 };
 
+function nodeGeted(xml) {
+    console.log(xml);
+}
 
 function getNodes(xml) {
-    console.log(xml);
+
+    parseString(xml, function (err, result) {
+    
+        console.log(result);
+        
+        var nodeList = [];
+          
+        // We just want visible nodes
+        for (var i = 0; i < result.osm.node.length; ++i) {
+            var node =  result.osm.node[i]['$'];
+            if (node.visible) {
+                nodeList.push(node);
+                console.log(node);
+                
+                getXML({
+                    host: 'api.openstreetmap.org',
+                    port: 80,
+                    path: '/api/0.6/node/' + node.id,
+                    method: 'GET',
+                    headers: {
+                    'Authorization': 'Basic aGV4YXBvZGVzbXM6ZjlrYmZ1ang='
+                }}, nodeGeted)
+            }
+        }
+    });
 
 }
 
@@ -47,11 +74,11 @@ getXML({
     }
 }, getNodes);
 
+*/
 
-/*
 
 osmread.parse({
-    url: 'http://api.openstreetmap.org/api/0.6/map?bbox=46.2183546,6.2664576,46.5383546,6.5864576',
+    url: 'http://www.overpass-api.de/api/xapi?way[bbox=6.5694467,46.5201298,6.5794467,46.5301298]',
     format: 'xml',
     endDocument: function(){
         console.log('document end');
@@ -68,4 +95,4 @@ osmread.parse({
     error: function(msg){
         console.log('error: ' + msg);
     }
-}); */
+}); 
