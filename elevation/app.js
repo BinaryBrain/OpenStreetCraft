@@ -212,6 +212,14 @@ function createJsonMap(meterMap) {
 	return jsonMap;
 }
 
+function flatmap(array) {
+	var flat = [];
+
+	flat = flat.concat.apply(flat, array);
+
+	return flat;
+}
+
 var locations = getLocationsToMeasure(osmData.minLatitude, osmData.minLongitude, osmData.maxLatitude, osmData.maxLongitude);
 
 getElevationData(locations, function (data) {
@@ -230,7 +238,7 @@ getElevationData(locations, function (data) {
 		var meterMap = toMeterMap(degMap);
 		var jsonMap = createJsonMap(meterMap);
 
-		var json = JSON.stringify({ elevation: jsonMap, mods: [] });
+		var json = JSON.stringify({ elevation: jsonMap, "elevation-flat": flatmap(jsonMap), mods: [] });
 
 		console.log(json);
 
