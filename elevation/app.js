@@ -238,7 +238,7 @@ getElevationData(locations, function (data) {
 		var meterMap = toMeterMap(degMap);
 		var jsonMap = createJsonMap(meterMap);
 
-		var json = JSON.stringify({ elevation: jsonMap, "elevation-flat": flatmap(jsonMap), mods: [] });
+		var json = JSON.stringify({ "elevation-flat": flatmap(jsonMap), mods: [] });
 
 		console.log(json);
 
