@@ -1,4 +1,13 @@
 {
+    "highway":
+    {
+        "motorway": 44,
+        "trunk": 44,
+        "primary": 4,
+        "secondary": 4,
+        "tertiary": 4,
+        "unclassified": 4
+    },
     "building":
     {
         "apartments": 45,
@@ -11,14 +20,5 @@
         "industrial": 4,
         "university": 4,
         "yes": 4
-    },
-    "highways":
-    {
-        "motorway": 44,
-        "trunk": 44,
-        "primary": 4,
-        "secondary": 4,
-        "tertiary": 4,
-        "unclassified": 4
     }
 }
