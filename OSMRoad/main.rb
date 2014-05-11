@@ -2,19 +2,19 @@
 
 require 'json'
 
-def highways(data, tag = nil)
+def find_ways(data, key, tag = nil)
   if tag
     data['way'].select do |elem|
-      elem['tags']['highway'] == tag.to_s
+      elem['tags'][key] == tag.to_s
     end
   else
     data['way'].select do |elem|
-      elem['tags'].keys.include? 'highway'
+      elem['tags'].keys.include? key
     end
   end
 end
 
-def node_refs(data, ways)
+def find_node_refs(data, ways)
   ways.map do |w|
     w['nodeRefs'].map do |nr|
       node(data, nr)
@@ -66,17 +66,18 @@ road_data_file = './map_with_road.json'
 road_types_file = '../data/types/roads.json'
 road_types = JSON.parse(road_types_file)
 
-
-data = road_types.map do |(type, data_value)|
-  highways = highways(osm_data, type)
-  list_nodes = node_refs(osm_data, highways)
-  cubes = cubes_to_trace(list_nodes).map do |list_cubes|
-    list_cubes.flatten.map do |c|
-      [c.lat, c.lon]
+data = types.map do |(key, values)|
+  values.map do |(type, data_value)|
+    highways = find_ways(osm_data, key, type)
+    list_nodes = find_node_refs(osm_data, highways)
+    cubes = cubes_to_trace(list_nodes).map do |list_cubes|
+      list_cubes.flatten.map do |c|
+        [c.lat, c.lon]
+      end
     end
-  end
 
-  create_mod(elevation_data, cubes, data_value)
+    create_mod(elevation_data, cubes, data_value)
+  end
 end
 
-File.write(road_data_file, data)
+File.write(map_file, data)
