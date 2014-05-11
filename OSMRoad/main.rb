@@ -49,6 +49,14 @@ def cubes_on_segment(node1, node2)
   end
 end
 
+def create_mod(data, cubes, data_value)
+  elevation = data['elevation']
+  cubes_coordinates = cubes.map do |c|
+    x, y = c.first, c.last
+    [x, y, elevation[x][y]]
+  end
+  data['mods'].push({ t: data_value, c: cubes_coordinates })
+end
 
 
 json_file = './OSMData.json'
