@@ -16,7 +16,6 @@ def draw_building(elevations, list_cubes)
   cubes_coordinates = list_cubes.map do |cubes|
     cubes.map do |c|
       x, y, height = c
-      x = 0
       elev = elevations[x][y]
       column = (elev..elev + height).map do |n|
         [x, y, n]

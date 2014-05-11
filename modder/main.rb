@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require 'json'
+require 'json/stream'
 
 def find_ways(data, key, tag = nil)
   ways = data['way']
@@ -52,8 +52,6 @@ def create_mod(data, key, list_cubes, data_value)
     rescue
       list_cubes.flatten(2).map do |c|
         (x, y) = c
-        x = 0
-        y = y|| 0
         [x, y, elevation[x][y], data_value]
       end
     end
@@ -80,17 +78,16 @@ def process_main(map_data, osm_data, types)
     mod.compact
   end
 
-  require 'pry'; binding.pry
   map_data['mods'] = mods.reject { |c| c.empty? }.flatten
   map_data
 end
 
-map_file = '../data/map.json'
-map_data = JSON.parse(File.open(map_file).read)
-osm_data_file = '../data/OSMData.json'
-osm_data = JSON.parse(File.open(osm_data_file).read)
-types_file = '../data/types.json'
-types = JSON.parse(File.open(types_file).read)
+map_file = File.open('../data/map.json')
+map_data = JSON::Stream::Parser.parse(map_file)
+osm_data_file = File.open('../data/OSMData.json')
+osm_data = JSON::Stream::Parser.parse(osm_data_file)
+types_file = File.open('../data/types.json')
+types = JSON::Stream::Parser.parse(types_file)
 
 data = process_main(map_data, osm_data, types)
 File.write(map_file, data.to_json)
