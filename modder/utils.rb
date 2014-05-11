@@ -1,5 +1,3 @@
-require 'set'
-
 def line(x0, y0, x1, y1)
   range = x0 < x1 ? (x0.to_i..x1.to_i) : (x1.to_i..x0.to_i)
   range.map do |n|

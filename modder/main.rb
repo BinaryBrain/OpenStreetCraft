@@ -46,7 +46,7 @@ def cubes_to_trace(key, list_nodes)
 end
 
 def create_mod(data, key, list_cubes, data_value)
-  elevation = data['elevation-flat'].take(1_000_000).each_slice(1000).to_a
+  elevation = data['elevation-flat'].each_slice(1001).to_a
   unless elevation.empty?
     begin
       send("draw_#{key}", elevation, list_cubes)
