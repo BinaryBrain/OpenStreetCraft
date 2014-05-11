@@ -16,13 +16,17 @@ def draw_building(elevations, list_cubes)
   cubes_coordinates = list_cubes.map do |cubes|
     cubes.map do |c|
       height = c.pop
-      x = x < 0 || x >= 1000 ? 0 : x
-      y = y < 0 || y >= 1000 ? 0 : y
-      elev = elevations[x][y]
-      column = (elev..elev + height).map do |n|
-        [x, y, n]
+
+      c.each_slice(2).map do |cube|
+        x, y = cube
+        x = x < 0 || x >= 1000 ? 0 : x
+        y = y < 0 || y >= 1000 ? 0 : y
+        elev = elevations[x][y]
+        column = (elev..elev + height).map do |n|
+          [x, y, n]
+        end
+        column.flatten(1)
       end
-      column.flatten(1)
     end
   end
 

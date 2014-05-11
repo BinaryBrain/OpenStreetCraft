@@ -51,7 +51,7 @@ def create_mod(data, key, list_cubes, data_value)
     begin
       send("draw_#{key}", elevation, list_cubes)
     rescue
-      list_cubes.flatten(2).map do |c|
+      list_cubes.flatten(2).each_slice(2).map do |c|
         (x, y) = c
         if x.nil?
           x = 0

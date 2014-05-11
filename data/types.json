@@ -3,10 +3,14 @@
     {
         "motorway": 44,
         "trunk": 44,
-        "primary": 4,
-        "secondary": 4,
-        "tertiary": 4,
-        "unclassified": 4
+        "primary": 21,
+        "secondary": 21,
+        "tertiary": 21,
+        "unclassified": 21,
+        "residential": 21,
+        "service": 21,
+        "living_street": 21,
+        "road": 21
     },
     "building":
     {
