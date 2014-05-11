@@ -3,21 +3,30 @@
 require 'json'
 
 def find_ways(data, key, tag = nil)
+  ways = data['way']
   if tag
-    data['way'].select do |elem|
+    ways.select do |elem|
       elem['tags'][key] == tag.to_s
     end
   else
-    data['way'].select do |elem|
-      elem['tags'].keys.include? key
+    begin
+      send("find_ways_#{key}", ways)
+    rescue NoMethodError
+      data['way'].select do |elem|
+        elem['tags'].keys.include? key
+      end
     end
   end
 end
 
-def find_node_refs(data, ways)
+def find_node_refs(data, key, ways)
   ways.map do |w|
-    w['nodeRefs'].map do |nr|
-      node(data, nr)
+    w['nodeRefs'].map do |node_refs|
+      begin
+        send("get_node_#{key}", data, node_refs)
+      rescue NoMethodError
+        node(data, node_refs)
+      end
     end
   end
 end
@@ -27,20 +36,21 @@ def node(data, node_ref)
   [node['lat'].to_f, node['lon'].to_f]
 end
 
-# must return
 def cubes_to_trace(key, list_nodes)
-  if require "./mod_#{key}"
-    send("process_#{key}", list_nodes)
-  end
+  send("process_#{key}", list_nodes)
 end
 
-def create_mod(data, list_cubes, data_value)
+def create_mod(data, key, list_cubes, data_value)
   elevation = data['elevation']
   unless elevation.empty?
     cubes_coordinates = list_cubes.map do |cubes|
       cubes.map do |c|
-        (x, y) = c
-        [x, y, elevation[x][y]]
+        begin
+          send("draw_#{key}", elevation, c)
+        rescue
+          (x, y) = c
+          [x, y, elevation[x][y]]
+        end
       end
     end
     { t: data_value, c: cubes_coordinates }
@@ -49,20 +59,25 @@ end
 
 def process_main(map_data, osm_data, types)
   mods = types.map do |(key, values)|
-    values.map do |(type, data_value)|
-      highways = find_ways(osm_data, key, type)
-      unless highways.empty?
-        list_nodes = find_node_refs(osm_data, highways)
-        cubes = cubes_to_trace(key, list_nodes).map do |list_cubes|
-          list_cubes.flatten
-        end
+    mod = values.map do |(type, data_value)|
+      begin
+        require "./mod_#{key}"
+      rescue LoadError
+        raise "Cannot found file ./mod_#{key}.rb"
+      end
 
-        create_mod(map_data, cubes, data_value)
+      ways = find_ways(osm_data, key, type)
+      unless ways.empty?
+        list_nodes = find_node_refs(osm_data, key, ways)
+        list_cubes = cubes_to_trace(key, list_nodes)
+        create_mod(map_data, key, list_cubes, data_value)
       end
     end
+
+    mod.compact
   end
 
-  map_data['mods'] = mods.compact
+  map_data['mods'] = mods.reject { |c| c.empty? }
   map_data
 end
 
