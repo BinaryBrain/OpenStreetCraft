@@ -4,7 +4,7 @@ fs = require('fs');
 osmData = require('../osm-data.json');
 ep = require('./encoded-polyline.js');
 
-var OUTPUT_JSON = '../data/map.json'
+var OUTPUT_JSON = '../data/elevation.json'
 
 var squareSize = 1000; // 1000m
 var DegreePerMeter = 111111;
@@ -324,6 +324,8 @@ function writeJson(json) {
 var locations = getLocationsToMeasure(osmData.minLatitude, osmData.minLongitude, osmData.maxLatitude, osmData.maxLongitude);
 
 getElevationData(locations, function (data) {
+	console.time('run');
+
 	var data = JSON.parse(data);
 	if(data.status = "OK") {
 		//console.time('run');
@@ -343,7 +345,7 @@ getElevationData(locations, function (data) {
 
 		writeJson(json);
 
-		//console.timeEnd('run');
+		console.timeEnd('run');
 	} else {
 		console.error('error', data);
 	}
