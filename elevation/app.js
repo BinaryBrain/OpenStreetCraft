@@ -224,65 +224,6 @@ function interpolateMap(jsonMap, keyMap) {
 	}
 
 	return jsonMap;
-
-	/*
-	x = 0.5;
-	y = 0.5;
-
-	var h1 = keyMap[0][0]
-	var h2 = keyMap[2][0]
-	var h3 = keyMap[0][2]
-	var h4 = keyMap[2][2]
-
-	var a00 = h1;
-	var a10 = h2 - h1;
-	var a01 = h3 - h1;
-	var a11 = h1 - h2 - h3 + h4;
-
-	h = a00 + a10 * x + a01 * y + a11 * x * y;
-
-	console.log(h);
-	*/
-}
-
-function oldInterpolateMap(jsonMap, keyMap) {
-	resetKeyMap(jsonMap, keyMap);
-
-	var rounds = ((squareSize/(elevationAPI-1))*0.75*10) | 0;
-	
-	//rounds = 1; // debug
-	for(var i = 0; i < rounds; i++) {
-		for(var x = 0; x <= squareSize; x++) {
-			for (var y = 0; y <= squareSize; y++) {
-				// moyenne
-				var sum = 0; 
-				var n = 0;
-
-				if(x >= 1) {
-					sum += jsonMap[x-1][y];
-					n++;
-				}
-				if(x <= squareSize-1) {
-					sum += jsonMap[x+1][y];
-					n++;
-				}
-				if(y >= 1) {
-					sum += jsonMap[x][y-1];
-					n++;
-				}
-				if(y <= squareSize-1) {
-					sum += jsonMap[x][y+1];
-					n++;
-				}
-
-				jsonMap[x][y] = Math.round(sum/n);
-			}
-		}
-
-		resetKeyMap(jsonMap, keyMap);
-	}
-
-	return jsonMap;
 }
 
 function roundMap(jsonMap) {
