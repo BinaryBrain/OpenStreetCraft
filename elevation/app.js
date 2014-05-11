@@ -111,18 +111,34 @@ function initKeyMap(meterMap) {
 	return keyMap;
 }
 
-function initJsonMap() {
+function initJsonMap(keyAvg) {
 	var jsonMap = [];
 
 	for(var x = 0; x <= squareSize; x++) {
 		jsonMap.push([]);
 
 		for(var y = 0; y <= squareSize; y++) {
-			jsonMap[x].push(0);
+			jsonMap[x].push(keyAvg);
 		}
 	}
 
 	return jsonMap;
+}
+
+function computeKeyAvg(keyMap) {
+	var sum = 0;
+	var n = 0;
+
+	for(var x = 0, l = keyMap.length; x < l; x++) {
+		for(var y = 0, g = keyMap[x].length; y < g; y++) {
+			if(keyMap[x][y] !== undefined) {
+				sum += keyMap[x][y];
+				n++;
+			}
+		}
+	}
+
+	return sum/n;
 }
 
 function resetKeyMap(jsonMap, keyMap) {
@@ -141,27 +157,36 @@ function resetKeyMap(jsonMap, keyMap) {
 function interpolateMap(jsonMap, keyMap) {
 	resetKeyMap(jsonMap, keyMap);
 
-	var rounds = keyMap.length*0.75;
-	rounds = 1; // debug
+	var rounds = ((squareSize/(elevationAPI-1))*0.75*10) | 0;
+	
+	//rounds = 1; // debug
 	for(var i = 0; i < rounds; i++) {
-		/*for(var x = 0; x <= squareSize; x++) {
+		for(var x = 0; x <= squareSize; x++) {
 			for (var y = 0; y <= squareSize; y++) {
 				// moyenne
-				var avg = []
+				var sum = 0; 
+				var n = 0;
+
 				if(x >= 1) {
-					avg.push(jsonMap[x-1][y]);
+					sum += jsonMap[x-1][y];
+					n++;
 				}
 				if(x <= squareSize-1) {
-					avg.push(jsonMap[x+1][y]);
+					sum += jsonMap[x+1][y];
+					n++;
 				}
 				if(y >= 1) {
-					avg.push(jsonMap[x][y-1]);
+					sum += jsonMap[x][y-1];
+					n++;
 				}
 				if(y <= squareSize-1) {
-					avg.push(jsonMap[x][y+1]);
+					sum += jsonMap[x][y+1];
+					n++;
 				}
+
+				jsonMap[x][y] = Math.round(sum/n);
 			}
-		}*/
+		}
 
 		resetKeyMap(jsonMap, keyMap);
 	}
@@ -169,9 +194,18 @@ function interpolateMap(jsonMap, keyMap) {
 	return jsonMap;
 }
 
+function roundMap(jsonMap) {
+	return jsonMap.map(function (e) {
+		return e.map(function (f) {
+			return f; // TODO: fast round
+		})
+	})
+}
+
 function createJsonMap(meterMap) {
-	var jsonMap = initJsonMap();
 	var keyMap = initKeyMap(meterMap);
+	var keyAvg = computeKeyAvg(keyMap);
+	var jsonMap = initJsonMap(keyAvg);
 
 	jsonMap = interpolateMap(jsonMap, keyMap);
 
@@ -183,6 +217,8 @@ var locations = getLocationsToMeasure(osmData.minLatitude, osmData.minLongitude,
 getElevationData(locations, function (data) {
 	var data = JSON.parse(data);
 	if(data.status = "OK") {
+		//console.time('run');
+
 		var degMap = [];
 
 		for (var i = 0, l = data.results.length; i < l; i++) {
@@ -196,9 +232,9 @@ getElevationData(locations, function (data) {
 
 		var json = JSON.stringify({ elevation: jsonMap, mods: [] });
 
-
 		console.log(json);
 
+		//console.timeEnd('run');
 	} else {
 		console.error('error', data);
 	}
