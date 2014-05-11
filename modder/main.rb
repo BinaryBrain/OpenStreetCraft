@@ -89,4 +89,4 @@ types_file = '../data/types.json'
 types = JSON.parse(File.open(types_file).read)
 
 data = process_main(map_data, osm_data, types)
-File.write(map_file, data)
+File.write(map_file, data.to_json)
