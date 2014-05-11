@@ -36,13 +36,34 @@ end
 
 def create_mod(data, list_cubes, data_value)
   elevation = data['elevation']
-  cubes_coordinates = list_cubes.map do |cubes|
-    cubes.map do |c|
-      (x, y) = c
-      [x, y, elevation[x][y]]
+  unless elevation.empty?
+    cubes_coordinates = list_cubes.map do |cubes|
+      cubes.map do |c|
+        (x, y) = c
+        [x, y, elevation[x][y]]
+      end
+    end
+    { t: data_value, c: cubes_coordinates }
+  end
+end
+
+def process_main(map_data, osm_data, types)
+  mods = types.map do |(key, values)|
+    values.map do |(type, data_value)|
+      highways = find_ways(osm_data, key, type)
+      unless highways.empty?
+        list_nodes = find_node_refs(osm_data, highways)
+        cubes = cubes_to_trace(key, list_nodes).map do |list_cubes|
+          list_cubes.flatten
+        end
+
+        create_mod(map_data, cubes, data_value)
+      end
     end
   end
-  data['mods'].push({ t: data_value, c: cubes_coordinates })
+
+  map_data['mods'] = mods.compact
+  map_data
 end
 
 map_file = '../data/map.json'
@@ -52,16 +73,5 @@ osm_data = JSON.parse(File.open(osm_data_file).read)
 types_file = '../data/types.json'
 types = JSON.parse(File.open(types_file).read)
 
-data = types.map do |(key, values)|
-  values.map do |(type, data_value)|
-    highways = find_ways(osm_data, key, type)
-    list_nodes = find_node_refs(osm_data, highways)
-    cubes = cubes_to_trace(key, list_nodes).map do |list_cubes|
-      list_cubes.flatten
-    end
-
-    create_mod(map_data, cubes, data_value)
-  end
-end
-
+data = process_main(map_data, osm_data, types)
 File.write(map_file, data)
