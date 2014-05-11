@@ -1,7 +1,7 @@
 require './utils.rb'
 
 def process_building(list_nodes)
-  yada = list_nodes.map do |nodes|
+  list_nodes.map do |nodes|
     closing_segment = [nodes.first, nodes.last]
     nodes.each_cons(2).to_a.push(closing_segment).map do |(node1, node2)|
       x0, y0 = node1
@@ -19,8 +19,6 @@ def draw_building(elevations, list_cubes)
 
       c.each_slice(2).map do |cube|
         x, y = cube
-        x = x < 0 || x >= 1000 ? 0 : x
-        y = y < 0 || y >= 1000 ? 0 : y
         elev = elevations[x][y]
         column = (elev..elev + height).map do |n|
           [x, y, n]
@@ -29,7 +27,6 @@ def draw_building(elevations, list_cubes)
       end
     end
   end
-
 
   cubes_coordinates.flatten();
 end
