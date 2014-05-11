@@ -86,7 +86,7 @@ function findMinProp(map, prop) {
 	var lowest = Number.POSITIVE_INFINITY;
 	var tmp;
 
-	for (var i = 0, l = map.length; i < l; i++) {
+	for(var i = 0, l = map.length; i < l; i++) {
 		tmp = map[i][prop];
 		
 		if (tmp < lowest) {
@@ -97,28 +97,109 @@ function findMinProp(map, prop) {
 	return lowest;
 }
 
+function initKeyMap(meterMap) {
+	var keyMap = [];
+
+	for(var x = 0; x < squareSize+1; x++) {
+		keyMap.push([]);
+	}
+
+	for(var i = 0, l = meterMap.length; i < l; i++) {
+		keyMap[meterMap[i].x][meterMap[i].y] = meterMap[i].z;
+	}
+
+	return keyMap;
+}
+
+function initJsonMap() {
+	var jsonMap = [];
+
+	for(var x = 0; x <= squareSize; x++) {
+		jsonMap.push([]);
+
+		for(var y = 0; y <= squareSize; y++) {
+			jsonMap[x].push(0);
+		}
+	}
+
+	return jsonMap;
+}
+
+function resetKeyMap(jsonMap, keyMap) {
+	for(var x = 0; x <= squareSize; x++) {
+		for (var y = 0; y <= squareSize; y++) {
+			if(keyMap[x][y] !== undefined) {
+				jsonMap[x][y] = keyMap[x][y];
+			}
+		}
+	}
+
+	return jsonMap;
+}
+
+
+function interpolateMap(jsonMap, keyMap) {
+	resetKeyMap(jsonMap, keyMap);
+
+	var rounds = keyMap.length*0.75;
+	rounds = 1; // debug
+	for(var i = 0; i < rounds; i++) {
+		/*for(var x = 0; x <= squareSize; x++) {
+			for (var y = 0; y <= squareSize; y++) {
+				// moyenne
+				var avg = []
+				if(x >= 1) {
+					avg.push(jsonMap[x-1][y]);
+				}
+				if(x <= squareSize-1) {
+					avg.push(jsonMap[x+1][y]);
+				}
+				if(y >= 1) {
+					avg.push(jsonMap[x][y-1]);
+				}
+				if(y <= squareSize-1) {
+					avg.push(jsonMap[x][y+1]);
+				}
+			}
+		}*/
+
+		resetKeyMap(jsonMap, keyMap);
+	}
+
+	return jsonMap;
+}
+
+function createJsonMap(meterMap) {
+	var jsonMap = initJsonMap();
+	var keyMap = initKeyMap(meterMap);
+
+	jsonMap = interpolateMap(jsonMap, keyMap);
+
+	return jsonMap;
+}
+
 var locations = getLocationsToMeasure(osmData.minLatitude, osmData.minLongitude, osmData.maxLatitude, osmData.maxLongitude);
 
 getElevationData(locations, function (data) {
-	try {
-		var data = JSON.parse(data);
-		if(data.status = "OK") {
-			var degMap = [];
+	var data = JSON.parse(data);
+	if(data.status = "OK") {
+		var degMap = [];
 
-			for (var i = 0, l = data.results.length; i < l; i++) {
-				var r = data.results[i];
+		for (var i = 0, l = data.results.length; i < l; i++) {
+			var r = data.results[i];
 
-				degMap.push({ x: r.location.lng, y: r.location.lat, z: r.elevation });
-			}
-
-			var meterMap = toMeterMap(degMap);
-
-			console.log(meterMap);
-
-		} else {
-			console.error('error', data);
+			degMap.push({ x: r.location.lng, y: r.location.lat, z: r.elevation });
 		}
-	} catch (e) {
-		console.error('error:', e);
+
+		var meterMap = toMeterMap(degMap);
+		var jsonMap = createJsonMap(meterMap);
+
+		var json = JSON.stringify({ elevation: jsonMap, mods: [] });
+
+
+		console.log(json);
+
+	} else {
+		console.error('error', data);
 	}
 });
