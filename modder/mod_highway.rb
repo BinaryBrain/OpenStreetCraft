@@ -9,6 +9,8 @@ def process_highway(list_nodes)
       l2 = line(x0 -1, y0 -1, x1 -1, y1 -1)
       l3 = line(x0, y0, x1, y1)
       l4 = line(x0 +1, y0 +1, x1 +1, y1 +1)
+
+      [l1, l2, l3, l4].flatten
     end
   end
 end
