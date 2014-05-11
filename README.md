@@ -10,6 +10,7 @@ OpenStreetMap to Minecraft Map
 ```javascript
 {
   'elevation': [[z, z, z, ...], [z, z, z, ...], ...],
+  'elevation-flat': [z, z, z, ...],
   'mods': [
     {
       't': '<data value, ex: 4 = cobblestone>',
