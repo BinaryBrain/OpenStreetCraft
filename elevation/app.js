@@ -1,10 +1,10 @@
 // https://maps.googleapis.com/maps/api/elevation/json?key=AIzaSyBXFkS07m9sgtvCZT-KYtuiUJRxuADDjvU&sensor=false&locations=46.515289,6.632239
 https = require('https');
 fs = require('fs');
-osmData = require('../osm-data.json');
+osmData = require('../data/OSMData.json');
 ep = require('./encoded-polyline.js');
 
-var OUTPUT_JSON = '../data/elevation.json'
+var OUTPUT_JSON = 'data/elevation.json'
 
 var squareSize = 1000; // 1000m
 var DegreePerMeter = 111111;
