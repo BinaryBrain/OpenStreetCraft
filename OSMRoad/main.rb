@@ -66,25 +66,17 @@ road_data_file = './map_with_road.json'
 road_types_file = '../data/types/roads.json'
 road_types = JSON.parse(road_types_file)
 
-json_file = './OSMData.json'
-data = JSON.parse(File.open(json_file).read)
 
-# all
-highways = highways data
-p highways.first
-p highways.count
+data = road_types.map do |(type, data_value)|
+  highways = highways(osm_data, type)
+  list_nodes = node_refs(osm_data, highways)
+  cubes = cubes_to_trace(list_nodes).map do |list_cubes|
+    list_cubes.flatten.map do |c|
+      [c.lat, c.lon]
+    end
+  end
 
-# with filter
-primaries = highways data, :primary
-p primaries.first
-p primaries.count
+  create_mod(elevation_data, cubes, data_value)
+end
 
-# nodes
-list_nodes = node_refs(data, highways)
-p list_nodes.first
-p list_nodes.count
-
-# all cubes to trace
-cubes = cubes_to_trace(list_nodes)
-p cubes.first.flatten.map { |c| [c.lat, c.lon] }
-p cubes.count
+File.write(road_data_file, data)
