@@ -34,7 +34,7 @@ end
 
 def node(data, node_ref)
   node = data['node'][node_ref.to_s]
-  [node['lat'].to_f, node['lon'].to_f]
+  [node['lon'].to_f, node['lat'].to_f]
 end
 
 def cubes_to_trace(key, list_nodes)
