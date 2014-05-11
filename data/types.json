@@ -1,0 +1,24 @@
+{
+    "building":
+    {
+        "apartments": 45,
+        "farm": 5,
+        "hotel": 45,
+        "house": 45,
+        "residential": 45,
+        "terrace": 45,
+        "commercial": 45,
+        "industrial": 4,
+        "university": 4,
+        "yes": 4
+    },
+    "highways":
+    {
+        "motorway": 44,
+        "trunk": 44,
+        "primary": 4,
+        "secondary": 4,
+        "tertiary": 4,
+        "unclassified": 4
+    }
+}

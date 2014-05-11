@@ -12,12 +12,12 @@ OpenStreetMap to Minecraft Map
   'elevation': [[z, z, z, ...], [z, z, z, ...], ...],
   'mods': [
     {
-      'type': 'stone',
-      'coordinates': [x, y, z]
+      't': '<data value, ex: 4 = cobblestone>',
+      'c': [x, y, z]
     },
     {
-      'type': <something>,
-      'coordinates': [x, y, z]
+      't': <something>,
+      'c': [x, y, z]
     },
     ...
   ]
