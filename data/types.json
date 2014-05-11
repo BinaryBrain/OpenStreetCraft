@@ -1,22 +1,22 @@
 {
     "highway":
     {
-        "motorway": 44,
-        "trunk": 44,
-        "primary": 21,
-        "secondary": 21,
-        "tertiary": 21,
-        "unclassified": 21,
-        "residential": 21,
-        "service": 21,
-        "living_street": 21,
-        "road": 21
+        "motorway": 124,
+        "trunk": 124,
+        "primary": 124,
+        "secondary": 124,
+        "tertiary": 124,
+        "unclassified": 124,
+        "residential": 124,
+        "service": 124,
+        "living_street": 124,
+        "road":124
     },
     "building":
     {
-        "apartments": 45,
-        "farm": 5,
-        "hotel": 45,
+        "apartments": 124,
+        "farm":124,
+        "hotel": 124,
         "house": 45,
         "residential": 45,
         "terrace": 45,
