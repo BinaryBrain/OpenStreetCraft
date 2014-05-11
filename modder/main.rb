@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 
+require 'json'
 require 'json/stream'
 
 def find_ways(data, key, tag = nil)
@@ -45,13 +46,21 @@ def cubes_to_trace(key, list_nodes)
 end
 
 def create_mod(data, key, list_cubes, data_value)
-  elevation = data['elevation'].each_slice(1000).to_a
+  elevation = data['elevation-flat'].take(1_000_000).each_slice(1000).to_a
   unless elevation.empty?
     begin
       send("draw_#{key}", elevation, list_cubes)
     rescue
       list_cubes.flatten(2).map do |c|
         (x, y) = c
+        if x.nil?
+          x = 0
+        end
+        if y.nil?
+          y = 0
+        end
+        x = (x < 0 || x >= 1000) ? 0 : x
+        y = (y < 0 || y >= 1000) ? 0 : y
         [x, y, elevation[x][y], data_value]
       end
     end
@@ -89,6 +98,9 @@ osm_data = JSON::Stream::Parser.parse(osm_data_file)
 types_file = File.open('../data/types.json')
 types = JSON::Stream::Parser.parse(types_file)
 
+
 data = process_main(map_data, osm_data, types)
+require 'pry'; binding.pry
+
 File.write(map_file, data.to_json)
 require 'pry'; binding.pry
