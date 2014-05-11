@@ -5,27 +5,27 @@ require 'json'
 def find_ways(data, key, tag = nil)
   ways = data['way']
   if tag
-    ways.select do |elem|
-      elem['tags'][key] == tag.to_s
-    end
-  else
     begin
-      send("find_ways_#{key}", ways)
+      send("find_ways_#{key}", ways, tag)
     rescue NoMethodError
       data['way'].select do |elem|
-        elem['tags'].keys.include? key
+        elem['tags'][key.to_s] == tag.to_s
       end
+    end
+  else
+    ways.select do |elem|
+      elem['tags'].keys.include? key
     end
   end
 end
 
 def find_node_refs(data, key, ways)
   ways.map do |w|
-    w['nodeRefs'].map do |node_refs|
+    w['nodeRefs'].map do |node_ref|
       begin
-        send("get_node_#{key}", data, node_refs)
+        send("get_node_#{key}", data, w, node_ref)
       rescue NoMethodError
-        node(data, node_refs)
+        node(data, node_ref)
       end
     end
   end
@@ -37,23 +37,26 @@ def node(data, node_ref)
 end
 
 def cubes_to_trace(key, list_nodes)
-  send("process_#{key}", list_nodes)
+  begin
+    send("process_#{key}", list_nodes)
+  rescue NoMethodError
+    raise "The function 'process_#{key}' must be defined"
+  end
 end
 
 def create_mod(data, key, list_cubes, data_value)
-  elevation = data['elevation']
+  elevation = data['elevation'].each_slice(1000).to_a
   unless elevation.empty?
-    cubes_coordinates = list_cubes.map do |cubes|
-      cubes.map do |c|
-        begin
-          send("draw_#{key}", elevation, c)
-        rescue
-          (x, y) = c
-          [x, y, elevation[x][y]]
-        end
+    begin
+      send("draw_#{key}", elevation, list_cubes)
+    rescue
+      list_cubes.flatten(2).map do |c|
+        (x, y) = c
+        x = 0
+        y = y|| 0
+        [x, y, elevation[x][y], data_value]
       end
     end
-    { t: data_value, c: cubes_coordinates }
   end
 end
 
@@ -77,7 +80,8 @@ def process_main(map_data, osm_data, types)
     mod.compact
   end
 
-  map_data['mods'] = mods.reject { |c| c.empty? }
+  require 'pry'; binding.pry
+  map_data['mods'] = mods.reject { |c| c.empty? }.flatten
   map_data
 end
 
@@ -90,3 +94,4 @@ types = JSON.parse(File.open(types_file).read)
 
 data = process_main(map_data, osm_data, types)
 File.write(map_file, data.to_json)
+require 'pry'; binding.pry
