@@ -29,7 +29,6 @@ end
 
 # must return
 def cubes_to_trace(key, list_nodes)
-  require 'pry'; binding.pry
   if require "./mod_#{key}"
     send("process_#{key}", list_nodes)
   end
