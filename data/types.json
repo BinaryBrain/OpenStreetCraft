@@ -11,18 +11,5 @@
         "service": 124,
         "living_street": 124,
         "road":124
-    },
-    "building":
-    {
-        "apartments": 124,
-        "farm":124,
-        "hotel": 124,
-        "house": 45,
-        "residential": 45,
-        "terrace": 45,
-        "commercial": 45,
-        "industrial": 4,
-        "university": 4,
-        "yes": 4
     }
 }

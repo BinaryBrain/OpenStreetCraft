@@ -91,8 +91,9 @@ def process_main(map_data, osm_data, types)
   map_data
 end
 
+elevation_file = File.open('../data/elevation.json')
 map_file = File.open('../data/map.json')
-map_data = JSON::Stream::Parser.parse(map_file)
+map_data = JSON::Stream::Parser.parse(elevation_file)
 osm_data_file = File.open('../data/OSMData.json')
 osm_data = JSON::Stream::Parser.parse(osm_data_file)
 types_file = File.open('../data/types.json')

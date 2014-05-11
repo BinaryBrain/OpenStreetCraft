@@ -14,7 +14,7 @@ end
 
 def draw_building(elevations, list_cubes)
   cubes_coordinates = list_cubes.map do |cubes|
-    cubes.map do |c|
+    yada = cubes.map do |c|
       height = c.pop
 
       c.each_slice(2).map do |cube|
