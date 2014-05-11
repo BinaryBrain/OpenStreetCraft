@@ -94,7 +94,6 @@ function toMeterMap(degMap) {
 	});
 
 	// Normalizing
-
 	var minX = findMinProp(meterMap, 'x');
 	var minY = findMinProp(meterMap, 'y');
 	var minZ = findMinProp(meterMap, 'z');
@@ -105,7 +104,23 @@ function toMeterMap(degMap) {
 		return { x: e.x, y: e.y, z: e.z + 2 }
 	});
 
+	var maxZ = findMaxProp(meterMap, 'z');
+
+	meterMap = toMeterMapWithMax(meterMap, 256, maxZ);
+
 	return meterMap;
+}
+
+function toMeterMapWithMax(meterMap, max, maxZ) {
+	return meterMap.map(function (e) {
+		var newZ = e.z - (maxZ - max);
+		
+		if(newZ <= 2) {
+			newZ = 2;
+		}
+		
+		return { x: e.x, y: e.y, z: newZ };
+	})
 }
 
 function findMinProp(map, prop) {
@@ -121,6 +136,21 @@ function findMinProp(map, prop) {
 	}
 
 	return lowest;
+}
+
+function findMaxProp(map, prop) {
+	var highest = Number.NEGATIVE_INFINITY;
+	var tmp;
+
+	for(var i = 0, l = map.length; i < l; i++) {
+		tmp = map[i][prop];
+		
+		if (tmp > highest) {
+			highest = tmp;
+		}
+	}
+
+	return highest;
 }
 
 function initKeyMap(meterMap) {
