@@ -4,10 +4,13 @@ fs = require('fs');
 osmData = require('../osm-data.json');
 ep = require('./encoded-polyline.js');
 
+var OUTPUT_JSON = '../data/map.json'
+
 var squareSize = 1000; // 1000m
 var DegreePerMeter = 111111;
 var squareSizeDegree = squareSize/DegreePerMeter;
 var elevationAPI = Math.floor(Math.sqrt(512));
+var keySpace = Math.round(squareSize/elevationAPI);
 
 function getElevationData(locations, cb) {
 	var encoded = ep.createEncodings(locations);
@@ -153,8 +156,96 @@ function resetKeyMap(jsonMap, keyMap) {
 	return jsonMap;
 }
 
+function getPrevKeyX(keyMap, iniX, iniY) {
+	for(var x = iniX-1; x >= 0; x--) {
+		if(keyMap[x] !== undefined && keyMap[x][iniY] !== undefined) {
+			return x;
+		}
+	}
+
+	return 0
+}
+
+function getPrevKeyY(keyMap, iniX, iniY) {
+	for(var y = iniY-1; y >= 0; y--) {
+		if(keyMap[iniX][y] !== undefined) {
+			return y;
+		}
+	}
+
+	return 0
+}
+
+function getNextKeyX(keyMap, iniX, iniY) {
+	for(var x = iniX+1; x <= squareSize; x++) {
+		if(keyMap[x] !== undefined && keyMap[x][iniY] !== undefined) {
+			return x;
+		}
+	}
+
+	return 1000
+}
+
+function getNextKeyY(keyMap, iniX, iniY) {
+	for(var y = iniY+1; y <= squareSize; y++) {
+		if(keyMap[iniX][y] !== undefined) {
+			return y;
+		}
+	}
+
+	return 1000
+}
 
 function interpolateMap(jsonMap, keyMap) {
+	for(var x = 0; x <= squareSize; x++) {
+		for (var y = 0; y <= squareSize; y++) {
+			var prevX = getPrevKeyX(x, y);
+			var prevY = getPrevKeyY(x, y);
+			var nextX = getNextKeyX(x, y);
+			var nextY = getNextKeyY(x, y);
+
+			var h1 = keyMap[prevX][prevY];
+			var h2 = keyMap[nextX][prevY];
+			var h3 = keyMap[prevX][nextY];
+			var h4 = keyMap[nextX][nextY];
+
+			var xx = x / (nextX - prevX);
+			var yy = y / (nextY - prevY);
+
+			var a00 = h1;
+			var a10 = h2 - h1;
+			var a01 = h3 - h1;
+			var a11 = h1 - h2 - h3 + h4;
+
+			h = a00 + a10 * xx + a01 * yy + a11 * xx * yy;
+
+			jsonMap[x][y] = h | 0;
+		}
+	}
+
+	return jsonMap;
+
+	/*
+	x = 0.5;
+	y = 0.5;
+
+	var h1 = keyMap[0][0]
+	var h2 = keyMap[2][0]
+	var h3 = keyMap[0][2]
+	var h4 = keyMap[2][2]
+
+	var a00 = h1;
+	var a10 = h2 - h1;
+	var a01 = h3 - h1;
+	var a11 = h1 - h2 - h3 + h4;
+
+	h = a00 + a10 * x + a01 * y + a11 * x * y;
+
+	console.log(h);
+	*/
+}
+
+function oldInterpolateMap(jsonMap, keyMap) {
 	resetKeyMap(jsonMap, keyMap);
 
 	var rounds = ((squareSize/(elevationAPI-1))*0.75*10) | 0;
@@ -220,6 +311,16 @@ function flatmap(array) {
 	return flat;
 }
 
+function writeJson(json) {
+	fs.writeFile(OUTPUT_JSON, json, function(err) {
+		if(err) {
+			console.log(err);
+		} else {
+			console.log("The file was saved as: "+OUTPUT_JSON);
+		}
+	}); 
+}
+
 var locations = getLocationsToMeasure(osmData.minLatitude, osmData.minLongitude, osmData.maxLatitude, osmData.maxLongitude);
 
 getElevationData(locations, function (data) {
@@ -240,7 +341,7 @@ getElevationData(locations, function (data) {
 
 		var json = JSON.stringify({ "elevation-flat": flatmap(jsonMap), mods: [] });
 
-		console.log(json);
+		writeJson(json);
 
 		//console.timeEnd('run');
 	} else {
