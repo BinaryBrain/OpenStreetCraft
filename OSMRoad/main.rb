@@ -58,6 +58,13 @@ def create_mod(data, cubes, data_value)
   data['mods'].push({ t: data_value, c: cubes_coordinates })
 end
 
+elevation_file = '../data/map.json'
+elevation_data = JSON.parse(File.open(elevation_file).read)
+osm_data_file = './OSMData.json'
+osm_data = JSON.parse(File.open(osm_data_file).read)
+road_data_file = './map_with_road.json'
+road_types_file = '../data/types/roads.json'
+road_types = JSON.parse(road_types_file)
 
 json_file = './OSMData.json'
 data = JSON.parse(File.open(json_file).read)
