@@ -4,7 +4,7 @@ var fs = require('fs');
 var osmData = require('../data/OSMData.json');
 var ep = require('./encoded-polyline.js');
 
-var OUTPUT_JSON = 'data/elevation.json'
+var OUTPUT_JSON = 'data/elevationCervin.json'
 
 var squareSize = 1000; // 1000m
 var DegreePerMeter = 111111;
