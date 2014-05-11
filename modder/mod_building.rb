@@ -30,6 +30,7 @@ def draw_building(elevations, list_cubes)
     end
   end
 
+
   cubes_coordinates.flatten();
 end
 

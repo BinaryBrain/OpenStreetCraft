@@ -61,7 +61,7 @@ def create_mod(data, key, list_cubes, data_value)
         end
         x = (x < 0 || x >= 1000) ? 0 : x
         y = (y < 0 || y >= 1000) ? 0 : y
-        [x, y, elevation[x][y], data_value]
+        [x, y, elevation[x][y] + 1, data_value]
       end
     end
   end

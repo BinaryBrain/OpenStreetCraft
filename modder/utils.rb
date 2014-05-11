@@ -3,12 +3,24 @@ def line(x0, y0, x1, y1)
   range.map do |n|
     sl = slope(x0, y0, x1, y1)
     dy = x0 * sl + y0
-    [n, dy.to_i + (sl * n).to_i] rescue [0, 0]
+    y_final_yada = dy.to_i + (sl * n).to_i
+    if y_final_yada.zero? or n.zero? or dy.zero? or sl.zero?
+      require 'pry'; binding.pry
+    end
+    [n, y_final_yada] rescue [0, 0]
   end
 end
 
 def slope(x0, y0, x1, y1)
-  (y1 - y0).abs / (x1 - x0).abs
+  sl = (y1 - y0).abs / (x1 - x0).abs
+
+  if sl.zero?
+    require 'pry'; binding.pry
+    sl
+  else
+    sl
+  end
+
 end
 
 # def line(x0, y0, x1, y1)
