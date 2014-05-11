@@ -24,58 +24,44 @@ end
 
 def node(data, node_ref)
   node = data['node'][node_ref.to_s]
-  lat, lon = node['lat'].to_f, node['lon'].to_f
-  OpenStruct.new({ lat: lat, lon: lon })
+  [node['lat'].to_f, node['lon'].to_f]
 end
 
-def cubes_to_trace(list_nodes)
-  list_nodes.map do |nodes|
-    nodes.each_cons(2).map do |(node1, node2)|
-      cubes_on_segment(node1, node2)
-    end
+# must return
+def cubes_to_trace(key, list_nodes)
+  require 'pry'; binding.pry
+  if require "./mod_#{key}"
+    send("process_#{key}", list_nodes)
   end
 end
 
-def slope(node1, node2)
-  (node2.lat - node1.lat).abs / (node2.lon - node1.lon).abs
-end
-
-def cubes_on_segment(node1, node2)
-  lon1, lon2 = node1.lon.to_i, node2.lon.to_i
-  range = lon1 < lon2 ? (lon1..lon2) : (lon2..lon1)
-  range.map do |n|
-    lat, lon = [(slope(node1, node2) * n).to_i, n] rescue [nil, nil]
-    OpenStruct.new({ lat: lat, lon: lon })
-  end
-end
-
-def create_mod(data, cubes, data_value)
+def create_mod(data, list_cubes, data_value)
   elevation = data['elevation']
-  cubes_coordinates = cubes.map do |c|
-    x, y = c.first, c.last
-    [x, y, elevation[x][y]]
+  cubes_coordinates = list_cubes.map do |cubes|
+    cubes.map do |c|
+      (x, y) = c
+      [x, y, elevation[x][y]]
+    end
   end
   data['mods'].push({ t: data_value, c: cubes_coordinates })
 end
 
 map_file = '../data/map.json'
-elevation_data = JSON.parse(File.open(map_file).read)
+map_data = JSON.parse(File.open(map_file).read)
 osm_data_file = '../data/OSMData.json'
 osm_data = JSON.parse(File.open(osm_data_file).read)
 types_file = '../data/types.json'
-types = JSON.parse(types_file)
+types = JSON.parse(File.open(types_file).read)
 
 data = types.map do |(key, values)|
   values.map do |(type, data_value)|
     highways = find_ways(osm_data, key, type)
     list_nodes = find_node_refs(osm_data, highways)
-    cubes = cubes_to_trace(list_nodes).map do |list_cubes|
-      list_cubes.flatten.map do |c|
-        [c.lat, c.lon]
-      end
+    cubes = cubes_to_trace(key, list_nodes).map do |list_cubes|
+      list_cubes.flatten
     end
 
-    create_mod(elevation_data, cubes, data_value)
+    create_mod(map_data, cubes, data_value)
   end
 end
 
