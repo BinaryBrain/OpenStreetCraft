@@ -1,7 +1,0 @@
-/Users/pierre/Misc/experiments/OpenStreetCraft/toMap/obj/Release/.NETFramework,Version=v4.0.AssemblyAttribute.cs
-/Users/pierre/Misc/experiments/OpenStreetCraft/toMap/bin/Release/BlockReplace.exe.mdb
-/Users/pierre/Misc/experiments/OpenStreetCraft/toMap/bin/Release/BlockReplace.exe
-/Users/pierre/Misc/experiments/OpenStreetCraft/toMap/obj/Release/BlockReplace.exe
-/Users/pierre/Misc/experiments/OpenStreetCraft/toMap/obj/Release/BlockReplace.exe.mdb
-/Users/pierre/Misc/experiments/OpenStreetCraft/toMap/bin/Release/Substrate.dll
-/Users/pierre/Misc/experiments/OpenStreetCraft/toMap/bin/Release/Newtonsoft.Json.dll
