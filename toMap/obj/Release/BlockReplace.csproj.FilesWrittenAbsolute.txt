@@ -1,7 +1,7 @@
-/Users/pierre/Downloads/substrate-1.3.8/SubstrateCS/Examples/BlockReplace/obj/Release/.NETFramework,Version=v4.0.AssemblyAttribute.cs
-/Users/pierre/Downloads/substrate-1.3.8/SubstrateCS/Examples/BlockReplace/bin/Release/BlockReplace.exe.mdb
-/Users/pierre/Downloads/substrate-1.3.8/SubstrateCS/Examples/BlockReplace/bin/Release/BlockReplace.exe
-/Users/pierre/Downloads/substrate-1.3.8/SubstrateCS/Examples/BlockReplace/obj/Release/BlockReplace.exe
-/Users/pierre/Downloads/substrate-1.3.8/SubstrateCS/Examples/BlockReplace/obj/Release/BlockReplace.exe.mdb
-/Users/pierre/Downloads/substrate-1.3.8/SubstrateCS/Examples/BlockReplace/bin/Release/Substrate.dll
-/Users/pierre/Downloads/substrate-1.3.8/SubstrateCS/Examples/BlockReplace/bin/Release/Newtonsoft.Json.dll
+/Users/pierre/Misc/experiments/OpenStreetCraft/toMap/obj/Release/.NETFramework,Version=v4.0.AssemblyAttribute.cs
+/Users/pierre/Misc/experiments/OpenStreetCraft/toMap/bin/Release/BlockReplace.exe.mdb
+/Users/pierre/Misc/experiments/OpenStreetCraft/toMap/bin/Release/BlockReplace.exe
+/Users/pierre/Misc/experiments/OpenStreetCraft/toMap/obj/Release/BlockReplace.exe
+/Users/pierre/Misc/experiments/OpenStreetCraft/toMap/obj/Release/BlockReplace.exe.mdb
+/Users/pierre/Misc/experiments/OpenStreetCraft/toMap/bin/Release/Substrate.dll
+/Users/pierre/Misc/experiments/OpenStreetCraft/toMap/bin/Release/Newtonsoft.Json.dll

@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Linq;
 using System.IO;
 using System.Collections.Generic;
@@ -31,8 +32,9 @@ namespace BlockReplace
 			JObject o = JObject.Parse(json);
 
 			
-			IList<int> elevations = o.SelectToken("elevation").Select(s => (int)s).ToList();
+			IList<int> elevations = o.SelectToken("elevation-flat").Select(s => (int)s).ToList();
 
+			Console.WriteLine ("Load Elevations...");
 			string dest = args [0];
 
 			AnvilWorld world = AnvilWorld.Open (dest);
@@ -40,15 +42,24 @@ namespace BlockReplace
 
 			bm.AutoLight = true;
 		
+
 			// Set Elevations
 			int i = 0;
+
 			while (i < elevations.Count) {
+				if (i % 100 == 0) {
+					Console.WriteLine(i);
+					//RegionChunkManager cm = world.GetChunkManager();
+					//cm.RelightDirtyChunks();
+
+				}
 				int el = elevations [i];
-				int x = i % 100;
-				int y = i / 100 | 0;
-				x -= 500;
-				y -= 500;
+				int y = i % 1001;
+				int x = i / 1001 | 0;
+				//x -= 500;
+				//y -= 500;
 				bm.SetID (x, el, y, (int)BlockType.GRASS);
+				
 				if (el > 1) {
 					bm.SetID (x, el - 1, y, (int)BlockType.DIRT);
 				}
@@ -63,29 +74,39 @@ namespace BlockReplace
 				}
 				++i;
 			}
+	
 
+			Console.WriteLine ("Load Mods");
 			IList<int> mods = o.SelectToken("mods").Select(s => (int)s).ToList();
 
-
+			Console.WriteLine (mods.Count);
 			i = 0;
-			while (i < mods.Count) {
-				int x = mods [i++];
-				int y = mods [i++];
-				int z = mods [i++];
-				int t = mods [i++];
-				x -= 500;
-				y -= 500;
+			while (i < mods.Count - 4) {
+				int y = (int)mods [i++];
+				int x = (int)mods [i++];
+				int z = (int)mods [i++];
+				int t = (int)mods [i++];
+		
+				if (t > 126) {
+					Console.WriteLine ("Failled");
+					Console.WriteLine (t);
+					Console.WriteLine (x);
+					Console.WriteLine (y);
+					Console.WriteLine (z);
+					continue;
+				}
+				//x -= 500;
+				//y -= 500;
 				// Check if valid block
-				if (t < 256 && z >= 0 && z <= 256) {
-					bm.SetID (x, z, y, t);
+				if (t < 256 && z > 0 && z <= 255) {
+					bm.SetID (y, z, x, t);
+
 				}
 			}
-
 			Console.WriteLine ("over generation");
-
-			bm.SetID (10, 10, 10, (int)BlockType.GRASS);
-			RegionChunkManager cm = world.GetChunkManager();
-			cm.RelightDirtyChunks();
+	
+			//	RegionChunkManager cm2 = world.GetChunkManager();
+			//cm2.RelightDirtyChunks();
 
 			world.Save();
 		}
