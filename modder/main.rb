@@ -53,14 +53,6 @@ def create_mod(data, key, list_cubes, data_value)
     rescue
       list_cubes.flatten(2).each_slice(2).map do |c|
         (x, y) = c
-        if x.nil?
-          x = 0
-        end
-        if y.nil?
-          y = 0
-        end
-        x = (x < 0 || x >= 1000) ? 0 : x
-        y = (y < 0 || y >= 1000) ? 0 : y
         [x, y, elevation[x][y] + 1, data_value]
       end
     end

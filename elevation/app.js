@@ -1,10 +1,33 @@
 // https://maps.googleapis.com/maps/api/elevation/json?key=AIzaSyBXFkS07m9sgtvCZT-KYtuiUJRxuADDjvU&sensor=false&locations=46.515289,6.632239
 var https = require('https');
 var fs = require('fs');
-var osmData = require('../data/OSMData.json');
 var ep = require('./encoded-polyline.js');
+var argv = require('yargs').argv;
 
-var OUTPUT_JSON = 'data/elevationCervin.json'
+var INPUT_JSON;
+var OUTPUT_JSON;
+
+if (argv._.length >= 2) {
+	INPUT_JSON = argv._[0];
+	OUTPUT_JSON = argv._[1];
+}
+else {
+	console.log('Error: missing argument: inputFile outputFile');
+	return;
+}
+
+function getOSMData(cb) {
+	fs.readFile(INPUT_JSON, 'utf8', function (err, data) {
+		if (err) {
+			console.error('Error: ' + err);
+			return;
+		}
+		 
+		data = JSON.parse(data);
+		 
+		cb(data);
+	});
+}
 
 var squareSize = 1000; // 1000m
 var DegreePerMeter = 111111;
@@ -71,7 +94,6 @@ function toMeterMap(degMap) {
 	});
 
 	// Normalizing
-
 	var minX = findMinProp(meterMap, 'x');
 	var minY = findMinProp(meterMap, 'y');
 	var minZ = findMinProp(meterMap, 'z');
@@ -82,7 +104,23 @@ function toMeterMap(degMap) {
 		return { x: e.x, y: e.y, z: e.z + 2 }
 	});
 
+	var maxZ = findMaxProp(meterMap, 'z');
+
+	meterMap = toMeterMapWithMax(meterMap, 256, maxZ);
+
 	return meterMap;
+}
+
+function toMeterMapWithMax(meterMap, max, maxZ) {
+	return meterMap.map(function (e) {
+		var newZ = e.z - (maxZ - max);
+		
+		if(newZ <= 2) {
+			newZ = 2;
+		}
+		
+		return { x: e.x, y: e.y, z: newZ };
+	})
 }
 
 function findMinProp(map, prop) {
@@ -98,6 +136,21 @@ function findMinProp(map, prop) {
 	}
 
 	return lowest;
+}
+
+function findMaxProp(map, prop) {
+	var highest = Number.NEGATIVE_INFINITY;
+	var tmp;
+
+	for(var i = 0, l = map.length; i < l; i++) {
+		tmp = map[i][prop];
+		
+		if (tmp > highest) {
+			highest = tmp;
+		}
+	}
+
+	return highest;
 }
 
 function initKeyMap(meterMap) {
@@ -262,32 +315,34 @@ function writeJson(json) {
 	}); 
 }
 
-var locations = getLocationsToMeasure(osmData.minLatitude, osmData.minLongitude, osmData.maxLatitude, osmData.maxLongitude);
+getOSMData(function (osmData) { 
+	var locations = getLocationsToMeasure(osmData.minLatitude, osmData.minLongitude, osmData.maxLatitude, osmData.maxLongitude);
 
-getElevationData(locations, function (data) {
-	console.time('run');
+	getElevationData(locations, function (data) {
+		console.time('run');
 
-	var data = JSON.parse(data);
-	if(data.status = "OK") {
-		//console.time('run');
+		var data = JSON.parse(data);
+		if(data.status = "OK") {
+			//console.time('run');
 
-		var degMap = [];
+			var degMap = [];
 
-		for (var i = 0, l = data.results.length; i < l; i++) {
-			var r = data.results[i];
+			for (var i = 0, l = data.results.length; i < l; i++) {
+				var r = data.results[i];
 
-			degMap.push({ x: r.location.lng, y: r.location.lat, z: r.elevation });
+				degMap.push({ x: r.location.lng, y: r.location.lat, z: r.elevation });
+			}
+
+			var meterMap = toMeterMap(degMap);
+			var jsonMap = createJsonMap(meterMap);
+
+			var json = JSON.stringify({ elevation: jsonMap, "elevation-flat": flatmap(jsonMap), mods: [] });
+
+			writeJson(json);
+
+			console.timeEnd('run');
+		} else {
+			console.error('error', data);
 		}
-
-		var meterMap = toMeterMap(degMap);
-		var jsonMap = createJsonMap(meterMap);
-
-		var json = JSON.stringify({ elevation: jsonMap, "elevation-flat": flatmap(jsonMap), mods: [] });
-
-		writeJson(json);
-
-		console.timeEnd('run');
-	} else {
-		console.error('error', data);
-	}
+	});
 });

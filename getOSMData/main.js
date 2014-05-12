@@ -1,11 +1,9 @@
-// usage : node main.js 6.563243099999999 46.518709099999995
+// usage : node main.js 46.518709099999995 6.563243099999999
 var osmread = require('osm-read');
 var fs = require('fs');
 
-var OUTPUT_JSON = 'data/OSMData.json';
-
-if (process.argv.length < 4) {
-    console.log('usage : node main.js 6.563243099999999 46.518709099999995');
+if (process.argv.length < 5) {
+    console.log('usage : node main.js 6.563243099999999 46.518709099999995 data/OSMData.json');
     return;
 }
 
@@ -13,8 +11,9 @@ var DEG_TO_METER = 111111;
 var ONE_METER = 0.000009; // number of deg in a meter
 var SQUARE_SIZE = 500; // meters
 
-var longitude = parseFloat(process.argv[2]);
-var latitude = parseFloat(process.argv[3]);
+var latitude = parseFloat(process.argv[2]);
+var longitude = parseFloat(process.argv[3]);
+var OUTPUT_JSON = process.argv[4];
 
 var minLongitude = longitude - ONE_METER * SQUARE_SIZE;
 var maxLongitude = longitude + ONE_METER * SQUARE_SIZE;
