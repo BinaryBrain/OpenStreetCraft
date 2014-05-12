@@ -29,6 +29,8 @@ function getOSMData(cb) {
 	});
 }
 
+var LEVEL_MAX = 255;
+
 var squareSize = 1000; // 1000m
 var DegreePerMeter = 111111;
 var squareSizeDegree = squareSize/DegreePerMeter;
@@ -106,7 +108,7 @@ function toMeterMap(degMap) {
 
 	var maxZ = findMaxProp(meterMap, 'z');
 
-	meterMap = toMeterMapWithMax(meterMap, 256, maxZ);
+	meterMap = toMeterMapWithMax(meterMap, LEVEL_MAX, maxZ);
 
 	return meterMap;
 }
@@ -167,14 +169,14 @@ function initKeyMap(meterMap) {
 	return keyMap;
 }
 
-function initJsonMap(keyAvg) {
+function initJsonMap() {
 	var jsonMap = [];
 
 	for(var x = 0; x <= squareSize; x++) {
 		jsonMap.push([]);
 
 		for(var y = 0; y <= squareSize; y++) {
-			jsonMap[x].push(keyAvg);
+			jsonMap[x].push(0);
 		}
 	}
 
@@ -209,66 +211,125 @@ function resetKeyMap(jsonMap, keyMap) {
 	return jsonMap;
 }
 
-function getPrevKeyX(keyMap, iniX, iniY) {
-	for(var x = iniX-1; x >= 0; x--) {
-		if(keyMap[x] !== undefined && keyMap[x][iniY] !== undefined) {
-			return x;
+
+function getBotRightKey(keyMap, iniX, iniY) {
+	for(var n = 0; n <= squareSize; n++) {
+		for(var x = iniX; x <= iniX+n; x++) {
+			var y = iniY+n;
+
+			if(keyMap[x] !== undefined && keyMap[x][y] !== undefined) {
+				return { x: x, y: y, z: keyMap[x][y] };
+			}
+		}
+
+		for(var y = iniY; y <= iniY+n; y++) {
+			var x = iniX+n;
+			
+			if(keyMap[x] !== undefined && keyMap[x][y] !== undefined) {
+				return { x: x, y: y, z: keyMap[x][y] };
+			}
 		}
 	}
 
-	return 0
+	console.error('Error: key not found from', iniX, iniY)
 }
 
-function getPrevKeyY(keyMap, iniX, iniY) {
-	for(var y = iniY-1; y >= 0; y--) {
-		if(keyMap[iniX][y] !== undefined) {
-			return y;
+function getBotLeftKey(keyMap, iniX, iniY) {
+	for(var n = 0; n <= squareSize; n++) {
+		for(var x = iniX; x >= iniX-n; x--) {
+			var y = iniY+n;
+
+			if(keyMap[x] !== undefined && keyMap[x][y] !== undefined) {
+				return { x: x, y: y, z: keyMap[x][y] };
+			}
+		}
+
+		for(var y = iniY; y <= iniY+n; y++) {
+			var x = iniX-n;
+			
+			if(keyMap[x] !== undefined && keyMap[x][y] !== undefined) {
+				return { x: x, y: y, z: keyMap[x][y] };
+			}
 		}
 	}
 
-	return 0
+	console.error('Error: key not found from', iniX, iniY)
 }
 
-function getNextKeyX(keyMap, iniX, iniY) {
-	for(var x = iniX+1; x <= squareSize; x++) {
-		if(keyMap[x] !== undefined && keyMap[x][iniY] !== undefined) {
-			return x;
+function getTopRightKey(keyMap, iniX, iniY) {
+	for(var n = 0; n <= squareSize; n++) {
+		for(var x = iniX; x <= iniX+n; x++) {
+			var y = iniY-n;
+
+			if(keyMap[x] !== undefined && keyMap[x][y] !== undefined) {
+				return { x: x, y: y, z: keyMap[x][y] };
+			}
+		}
+
+		for(var y = iniY; y >= iniY-n; y--) {
+			var x = iniX+n;
+			
+			if(keyMap[x] !== undefined && keyMap[x][y] !== undefined) {
+				return { x: x, y: y, z: keyMap[x][y] };
+			}
 		}
 	}
 
-	return 1000
+	console.error('Error: key not found from', iniX, iniY)
 }
 
-function getNextKeyY(keyMap, iniX, iniY) {
-	for(var y = iniY+1; y <= squareSize; y++) {
-		if(keyMap[iniX][y] !== undefined) {
-			return y;
+function getTopLeftKey(keyMap, iniX, iniY) {
+	for(var n = 0; n <= squareSize; n++) {
+		for(var x = iniX; x >= iniX-n; x--) {
+			var y = iniY-n;
+
+			if(keyMap[x] !== undefined && keyMap[x][y] !== undefined) {
+				return { x: x, y: y, z: keyMap[x][y] };
+			}
+		}
+
+		for(var y = iniY; y >= iniY-n; y--) {
+			var x = iniX-n;
+			
+			if(keyMap[x] !== undefined && keyMap[x][y] !== undefined) {
+				return { x: x, y: y, z: keyMap[x][y] };
+			}
 		}
 	}
 
-	return 1000
+	console.error('Error: key not found from', iniX, iniY)
 }
 
 function interpolateMap(jsonMap, keyMap) {
+	console.log("interpolating...")
+
 	for(var x = 0; x <= squareSize; x++) {
 		for (var y = 0; y <= squareSize; y++) {
-			var prevX = getPrevKeyX(x, y);
-			var prevY = getPrevKeyY(x, y);
-			var nextX = getNextKeyX(x, y);
-			var nextY = getNextKeyY(x, y);
+			var k1 = getTopLeftKey(keyMap, x, y);
+			var k2 = getTopRightKey(keyMap, x, y);
+			var k3 = getBotLeftKey(keyMap, x, y);
+			var k4 = getBotRightKey(keyMap, x, y);
 
-			var h1 = keyMap[prevX][prevY];
-			var h2 = keyMap[nextX][prevY];
-			var h3 = keyMap[prevX][nextY];
-			var h4 = keyMap[nextX][nextY];
+			var xx;
+			var yy;
 
-			var xx = x / (nextX - prevX);
-			var yy = y / (nextY - prevY);
+			if(k4.x - k1.x !== 0) {
+				xx = (x - k1.x) / (k4.x - k1.x);
+			}	
+			else {
+				xx = 1;
+			}
+			if(k4.y - k1.y !== 0) {
+				yy = (y - k1.y) / (k4.y - k1.y);
+			}	
+			else {
+				yy = 1;
+			}
 
-			var a00 = h1;
-			var a10 = h2 - h1;
-			var a01 = h3 - h1;
-			var a11 = h1 - h2 - h3 + h4;
+			var a00 = k1.z;
+			var a10 = k2.z - k1.z;
+			var a01 = k3.z - k1.z;
+			var a11 = k1.z - k2.z - k3.z + k4.z;
 
 			h = a00 + a10 * xx + a01 * yy + a11 * xx * yy;
 
@@ -276,6 +337,7 @@ function interpolateMap(jsonMap, keyMap) {
 		}
 	}
 
+	console.log("interpolation finished")
 	return jsonMap;
 }
 
@@ -290,7 +352,7 @@ function roundMap(jsonMap) {
 function createJsonMap(meterMap) {
 	var keyMap = initKeyMap(meterMap);
 	var keyAvg = computeKeyAvg(keyMap);
-	var jsonMap = initJsonMap(keyAvg);
+	var jsonMap = initJsonMap();
 
 	jsonMap = interpolateMap(jsonMap, keyMap);
 
