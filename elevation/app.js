@@ -56,8 +56,6 @@ function getElevationData(locations, cb) {
 		});
 
 		res.on('end', function() {
-			// console.log(output);
-
 			if(cb) {
 				cb(output);
 			}
@@ -89,6 +87,7 @@ function getLocationsToMeasure(minLat, minLon, maxLat, maxLon) {
 }
 
 function toMeterMap(degMap) {
+	// Degree to Meter
 	meterMap = degMap.map(function (e) {
 		return { x: e.x*DegreePerMeter, y: e.y*DegreePerMeter, z: e.z };
 	}).map(function (e) {
@@ -96,6 +95,11 @@ function toMeterMap(degMap) {
 	});
 
 	// Normalizing
+	// Max to LEVEL_MAX (and crop bottom)
+	var maxZ = findMaxProp(meterMap, 'z');
+	meterMap = toMeterMapWithMax(meterMap, LEVEL_MAX, maxZ);
+
+	// Stick to the floor
 	var minX = findMinProp(meterMap, 'x');
 	var minY = findMinProp(meterMap, 'y');
 	var minZ = findMinProp(meterMap, 'z');
@@ -105,10 +109,6 @@ function toMeterMap(degMap) {
 	}).map(function (e) {
 		return { x: e.x, y: e.y, z: e.z + 2 }
 	});
-
-	var maxZ = findMaxProp(meterMap, 'z');
-
-	meterMap = toMeterMapWithMax(meterMap, LEVEL_MAX, maxZ);
 
 	return meterMap;
 }
