@@ -52,11 +52,12 @@ namespace BlockReplace
               //cm.RelightDirtyChunks();
 
             }
-            int el = elevations [i];
-            int x = i % 1001;
-            int y = i / 1001 | 0;
-            //x -= 500;
-            //y -= 500;
+            int el = elevations[i];
+            int x = i / 1001 | 0;
+            int y = i % 1001;
+            x = 1001 - x; // Symetry
+            x -= 500;
+            y -= 500;
             
             bm.SetID (x, el, y, (int)BlockType.GRASS);
             
@@ -74,19 +75,18 @@ namespace BlockReplace
             }
             ++i;
           }
-      
 
-          Console.WriteLine ("Load Mods");
+          Console.WriteLine ("Load Mods...");
           IList<int> mods = o.SelectToken("mods").Select(s => (int)s).ToList();
 
           Console.WriteLine (mods.Count);
           i = 0;
           while (i < mods.Count - 4) {
-            int y = (int)mods [i++];
             int x = (int)mods [i++];
+            int y = (int)mods [i++];
             int z = (int)mods [i++];
             int t = (int)mods [i++];
-        
+            
             if (t > 126) {
               Console.WriteLine ("Failed");
               Console.WriteLine (t);
@@ -95,13 +95,14 @@ namespace BlockReplace
               Console.WriteLine (z);
               continue;
             }
-            
-            //x -= 500;
-            //y -= 500;
+
+            x = 1001 - x; // Symetry
+
+            x -= 500;
+            y -= 500;
             // Check if valid block
             if (t < 256 && z > 0 && z <= 255) {
-              bm.SetID (y, z, x, t);
-
+              bm.SetID (x, z, y, t);
             }
           }
           Console.WriteLine ("over generation");
