@@ -64,6 +64,7 @@ function drawBuildings(osmData, map) {
 
 function drawBuildingColumns(columns, map) {
 	var sum = 0;
+	var n = 0;
 	var walls = [];
 	
 	for(var i = 0, l = columns.length; i < l; i++) {
@@ -74,19 +75,17 @@ function drawBuildingColumns(columns, map) {
 		var y1 = columns[i].y;
 		var h = columns[i].h;
 
-		var z = getElevation(map, x1, y1);
-
 		geom.drawLine(x0, y0, x1, y1, function (x, y) {
 			var z = getElevation(map, x, y);
+			sum += z;
+			n++;
 			walls.push({ x: x, y: y, z: z, h: h });
 		});
-
-		sum += z;
 	}
 
-	var zAvg = sum/columns.length;
+	var zAvg = Math.round(sum/n);
 
-	walls.map(function (c) {
+	walls = walls.map(function (c) {
 		return { x: c.x, y: c.y, z: c.z, h: c.h+zAvg }
 	});
 
@@ -100,7 +99,7 @@ function drawColumn(column, map) {
 	var blockID = 1;
 	
 	for(var i = column.z; i <= column.h; i++) {
-		console.log(column.x, column.y, i, blockID);
+		//console.log(column.x, column.y, i, blockID);
 		map.mods.push(column.x, column.y, i, blockID);
 	}
 }
