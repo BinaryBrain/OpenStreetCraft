@@ -37,7 +37,7 @@ function drawBuildings(osmData, map) {
 	for(var i = 0, l = osmData.way.length; i < l; i++) {
 		if(osmData.way[i].tags.building) {
 			var refs = osmData.way[i].nodeRefs;
-			var h = genarateHeight(50, 100);
+			var h = genarateHeight(10, 20);
 			var columns = [];
 
 			var zSum = 0;
@@ -63,6 +63,9 @@ function drawBuildings(osmData, map) {
 }
 
 function drawBuildingColumns(columns, map) {
+	var sum = 0;
+	var walls = [];
+	
 	for(var i = 0, l = columns.length; i < l; i++) {
 		var prevColumn = (i === 0) ? columns.length-1 : i-1;
 		var x0 = columns[prevColumn].x;
@@ -71,21 +74,24 @@ function drawBuildingColumns(columns, map) {
 		var y1 = columns[i].y;
 		var h = columns[i].h;
 
-		var columns = geom.drawLine(x0, y0, x1, y1);
-		var sum = 0;
-		
-		for (var i = 0, l = columns.length; i < l; i++) {
-			var z = getElevation(map, columns[i].x, columns[i].y);
-			sum += z;
-		};
+		var z = getElevation(map, x1, y1);
 
-		var zAvg = sum/columns.length;
-
-		columns.map(function (c) {
-			return { x: c.x, y: c.y, z: c.z, h: c.h+zAvg }
+		geom.drawLine(x0, y0, x1, y1, function (x, y) {
+			var z = getElevation(map, x, y);
+			walls.push({ x: x, y: y, z: z, h: h });
 		});
 
-		drawColumn(columns, map);
+		sum += z;
+	}
+
+	var zAvg = sum/columns.length;
+
+	walls.map(function (c) {
+		return { x: c.x, y: c.y, z: c.z, h: c.h+zAvg }
+	});
+
+	for (var i = 0, l = walls.length; i < l; i++) {
+		drawColumn(walls[i], map);
 	}
 }
 
@@ -94,7 +100,7 @@ function drawColumn(column, map) {
 	var blockID = 1;
 	
 	for(var i = column.z; i <= column.h; i++) {
-		//console.log(column.x, column.y, i, blockID);
+		console.log(column.x, column.y, i, blockID);
 		map.mods.push(column.x, column.y, i, blockID);
 	}
 }
