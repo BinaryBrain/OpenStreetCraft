@@ -34,7 +34,8 @@ var OSM_DATA_BLOB = {
 };
 
 osmread.parse({
-    url: 'http://www.overpass-api.de/api/xapi?way[bbox=' + minLongitude+ ',' + minLatitude + ',' + maxLongitude + ',' + maxLatitude + ']',
+    //url: 'http://www.overpass-api.de/api/xapi?way[bbox=' + minLongitude+ ',' + minLatitude + ',' + maxLongitude + ',' + maxLatitude + ']',
+    url: 'http://api.openstreetmap.org/api/0.6/map?bbox=' + minLongitude+ ',' + minLatitude + ',' + maxLongitude + ',' + maxLatitude,
     format: 'xml',
     endDocument: function() {
         writeJson(JSON.stringify(OSM_DATA_BLOB));
