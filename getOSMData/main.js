@@ -33,6 +33,8 @@ var OSM_DATA_BLOB = {
     bounds : []
 };
 
+var url = 'http://api.openstreetmap.org/api/0.6/map?bbox=' + minLongitude+ ',' + minLatitude + ',' + maxLongitude + ',' + maxLatitude;
+
 osmread.parse({
     //url: 'http://www.overpass-api.de/api/xapi?way[bbox=' + minLongitude+ ',' + minLatitude + ',' + maxLongitude + ',' + maxLatitude + ']',
     url: 'http://api.openstreetmap.org/api/0.6/map?bbox=' + minLongitude+ ',' + minLatitude + ',' + maxLongitude + ',' + maxLatitude,
