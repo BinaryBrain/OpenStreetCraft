@@ -1,9 +1,9 @@
-// usage : node main.js 46.518709099999995 6.563243099999999
-var osmread = require('osm-read');
+// usage : node main.js 46.518709099999995 6.563243099999999 data/osm.json
+var osmread = require('../osm-read-custom');
 var fs = require('fs');
 
 if (process.argv.length < 5) {
-    console.log('usage : node main.js 6.563243099999999 46.518709099999995 data/OSMData.json');
+    console.log('usage : node main.js 46.518709099999995 6.563243099999999 data/OSMData.json');
     return;
 }
 
@@ -28,9 +28,10 @@ var OSM_DATA_BLOB = {
     maxLatitude : maxLatitude,
     minLongitude : minLongitude,
     maxLongitude : maxLongitude,
-    way : [],
+    way : {},
     node : {},
-    bounds : []
+    bounds : [],
+    relation : []
 };
 
 var url = 'http://api.openstreetmap.org/api/0.6/map?bbox=' + minLongitude+ ',' + minLatitude + ',' + maxLongitude + ',' + maxLatitude;
@@ -51,7 +52,10 @@ osmread.parse({
         OSM_DATA_BLOB.node[node.id] = node;
     },
     way: function(way){
-        OSM_DATA_BLOB.way.push(way);
+        OSM_DATA_BLOB.way[way.id] = way;
+    },
+    relation: function(relation){
+        OSM_DATA_BLOB.relation.push(relation);
     },
     error: function(msg){
         console.error('error: ' + msg);
@@ -61,7 +65,7 @@ osmread.parse({
 function writeJson(json) {
     fs.writeFile(OUTPUT_JSON, json, function(err) {
         if(err) {
-            console.log(err);
+            console.error('error: ' + err);
         } else {
             console.log("The file was saved as: "+OUTPUT_JSON);
         }

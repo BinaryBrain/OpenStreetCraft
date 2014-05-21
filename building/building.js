@@ -1,5 +1,4 @@
 var fs = require('fs');
-var osmData = require('../data/OSMData.json');
 var argv = require('yargs').argv;
 var geom = require('../geom');
 
@@ -33,27 +32,55 @@ function getFile(filename, cb) {
 var squareSize = 1000;
 var DegreePerMeter = 111111;
 
-function drawBuildings(osmData, map) {
-	for(var i = 0, l = osmData.way.length; i < l; i++) {
-		if(osmData.way[i].tags.building) {
-			var refs = osmData.way[i].nodeRefs;
-			var h = genarateHeight(10, 20);
-			var columns = [];
+function getWays(osmData) {
+	var ways = [];
 
-			var zSum = 0;
+	// Ways
+	Object.keys(osmData.way).forEach(function(key) {
+		var way = osmData.way[key];
 
-			for(var j = 0, k = refs.length; j < k; j++) {
-				var lat = osmData.node[refs[j]].lat;
-				var lon = osmData.node[refs[j]].lon;
-
-				var x = lon;
-				var y = lat;
-
-				columns.push({ x: x, y: y, z: 0, h: h });
-			}
-
-			drawBuildingColumns(columns, map);
+		if(way.tags.building) {
+			ways.push(way);
 		}
+	});
+
+	// Relations
+	for(var i = 0, l = osmData.relation.length; i < l; i++) {
+		if(osmData.relation[i].tags.building) {
+			var wayRefs = osmData.relation[i].members.ways;
+
+			for(var j = 0, k = wayRefs.length; j < k; j++) {
+				var way = osmData.way[wayRefs[j].ref];
+
+				if(way) {
+					ways.push(way);
+				}
+			}
+		}
+	}
+
+	return ways;
+}
+
+function drawBuildings(osmData, ways, map) {
+	for(var i = 0, l = ways.length; i < l; i++) {
+		var refs = ways[i].nodeRefs;
+		var h = genarateHeight(10, 20);
+		var columns = [];
+
+		var zSum = 0;
+
+		for(var j = 0, k = refs.length; j < k; j++) {
+			var lat = osmData.node[refs[j]].lat;
+			var lon = osmData.node[refs[j]].lon;
+
+			var x = lon;
+			var y = lat;
+
+			columns.push({ x: x, y: y, z: 0, h: h });
+		}
+
+		drawBuildingColumns(columns, map);
 	}
 
 	//console.log(map);
@@ -77,8 +104,14 @@ function drawBuildingColumns(columns, map) {
 
 		geom.drawLine(x0, y0, x1, y1, function (x, y) {
 			var z = getElevation(map, x, y);
-			sum += z;
-			n++;
+
+			if(z) {
+				sum += z;
+				n++;	
+			} else {
+				z = 1;
+			}
+
 			walls.push({ x: x, y: y, z: z, h: h });
 		});
 	}
@@ -99,7 +132,6 @@ function drawColumn(column, map) {
 	var blockID = 1;
 	
 	for(var i = column.z; i <= column.h; i++) {
-		//console.log(column.x, column.y, i, blockID);
 		map.mods.push(column.x, column.y, i, blockID);
 	}
 }
@@ -109,7 +141,7 @@ function getElevation(map, x, y) {
 	if(map.elevation[x] && map.elevation[x][y]) {
 		z = map.elevation[x][y];
 	} else {
-		z = 1;
+		z = undefined;
 	}
 
 	return z;
@@ -137,6 +169,6 @@ console.time('run');
 
 getFile(INPUT_OSM_JSON, function(osmData) {
 	getFile(INPUT_MAP_JSON, function (map) {
-		drawBuildings(osmData, map);
+		drawBuildings(osmData, getWays(osmData), map);
 	});
 });
