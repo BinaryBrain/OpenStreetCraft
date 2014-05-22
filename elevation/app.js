@@ -303,6 +303,10 @@ function getTopLeftKey(keyMap, iniX, iniY) {
 function interpolateMap(jsonMap, keyMap) {
 	console.log("interpolating...")
 
+	var total = squareSize*squareSize;
+	var done = 0;
+	var percent = -1;
+
 	for(var x = 0; x <= squareSize; x++) {
 		for (var y = 0; y <= squareSize; y++) {
 			var k1 = getTopLeftKey(keyMap, x, y);
@@ -334,6 +338,13 @@ function interpolateMap(jsonMap, keyMap) {
 			h = a00 + a10 * xx + a01 * yy + a11 * xx * yy;
 
 			jsonMap[x][y] = h | 0;
+
+			done++;
+			var newPercent = Math.floor((done*100) / total);
+			if(newPercent > percent) {
+				percent = newPercent;
+				console.log(percent+"%");
+			}
 		}
 	}
 
