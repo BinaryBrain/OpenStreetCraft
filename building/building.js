@@ -94,8 +94,9 @@ function drawBuildingColumns(columns, map) {
 	var n = 0;
 	var walls = [];
 	
-	for(var i = 0, l = columns.length; i < l; i++) {
-		var prevColumn = (i === 0) ? columns.length-1 : i-1;
+	for(var i = 1, l = columns.length; i < l; i++) {
+		var prevColumn = i-1;
+
 		var x0 = columns[prevColumn].x;
 		var y0 = columns[prevColumn].y;
 		var x1 = columns[i].x;

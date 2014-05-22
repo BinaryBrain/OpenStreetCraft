@@ -1,5 +1,5 @@
 // usage : node main.js 46.518709099999995 6.563243099999999 data/osm.json
-var osmread = require('../osm-read-custom');
+var osmread = require('osm-read');
 var fs = require('fs');
 
 if (process.argv.length < 5) {
